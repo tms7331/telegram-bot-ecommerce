@@ -40,11 +40,10 @@ bot.command('start', async (ctx) => {
         { command: "reader", description: "Open Reader" },
         { command: "inventory", description: "View Inventory" },
     ]);
-
     const senderName = ctx.update["message"]?.from.username;
-    const respText = `Greetings, @${senderName}! I am EcommerceBot, a bot that can help you navigate the storefront.\n
+    const respText = `Hello, @${senderName}! I am E-commerceBot, a bot that can help you navigate the science fiction book storefront.\n
 I can help you view the inventory, recommend books based on your past purchases, and buy new items.\n
-Try \inventory to view the inventory, \shop to open the integrated shop, or \reader to open the integrated reader\n
+\\inventory to view the inventory, \\shop to open the integrated shop, or \\reader to open the integrated reader\n
 Or you can chat with me to get help and recommendations`;
     ctx.reply(respText);
 });
@@ -57,7 +56,7 @@ bot.command("buy", (ctx) => {
                 [
                     {
                         text: "Open Shop",
-                        web_app: { url: "https://google.com" },
+                        web_app: { url: "https://telegram-bot-ecommerce-frontend.vercel.app/store" },
                     },
                 ],
             ],
@@ -72,7 +71,7 @@ bot.command("reader", (ctx) => {
                 [
                     {
                         text: "Open Reader",
-                        web_app: { url: "https://google.com" },
+                        web_app: { url: "https://telegram-bot-ecommerce-frontend.vercel.app/reader" },
                     },
                 ],
             ],
