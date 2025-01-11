@@ -1,4 +1,4 @@
-import { Bot } from 'grammy';
+import { Bot, InlineKeyboard } from 'grammy';
 import { OpenAI } from 'openai';
 import * as dotenv from 'dotenv';
 import { inventory } from './inventory.js';
@@ -16,10 +16,10 @@ async function genResponse(inventory: string, purchases: string, message: string
     const completion = await openai.chat.completions.create({
         messages: [{
             'role': 'system',
-            'content': `You are an intelligent assistant tasked with providing help to users for a storefront that sells sci-fi novels.
-Here is the inventory, each line of which has the format: ID|Title|Author|Price|ISBN|Genre|Stock|Rating
+            'content': `You are an intelligent assistant tasked with providing help to users for a storefront that sells sci-fi novels.  They might ask a variety of questions, your task is to help with anything they ask.
+Here is the store inventory, each line of which has the format: ID|Title|Author|Price|Genre|Stock|Rating
 ${inventory}
-And here is the list of purchases made by this user, each line of which has the format: ID|Title|Author|Price|ISBN|Genre|Stock|Rating
+And here is the list of purchases made by this user, each line of which has the format: ID|Title|Author|Price|Genre|Stock|Rating
 ${purchases}`
         },
         {
@@ -35,18 +35,61 @@ ${purchases}`
 
 
 bot.command('start', async (ctx) => {
+    await ctx.api.setMyCommands([
+        { command: "buy", description: "Open Shop" },
+        { command: "reader", description: "Open Reader" },
+        { command: "inventory", description: "View Inventory" },
+    ]);
+
     const senderName = ctx.update["message"]?.from.username;
     const respText = `Greetings, @${senderName}! I am EcommerceBot, a bot that can help you navigate the storefront.\n
-I can help you view the inventory, recommend books based on your past purchases, and buy new items.`;
+I can help you view the inventory, recommend books based on your past purchases, and buy new items.\n
+Try \inventory to view the inventory, \shop to open the integrated shop, or \reader to open the integrated reader\n
+Or you can chat with me to get help and recommendations`;
     ctx.reply(respText);
 });
 
 
+bot.command("buy", (ctx) => {
+    ctx.reply("Click below to open the shop:", {
+        reply_markup: {
+            inline_keyboard: [
+                [
+                    {
+                        text: "Open Shop",
+                        web_app: { url: "https://google.com" },
+                    },
+                ],
+            ],
+        },
+    });
+});
+
+bot.command("reader", (ctx) => {
+    ctx.reply("Click below to open the reader:", {
+        reply_markup: {
+            inline_keyboard: [
+                [
+                    {
+                        text: "Open Reader",
+                        web_app: { url: "https://google.com" },
+                    },
+                ],
+            ],
+        },
+    });
+});
+
+
+bot.command("inventory", (ctx) => {
+    ctx.reply(inventory);
+});
+
 
 bot.on('message', async (ctx) => {
     const text = ctx.message?.text;
-    // const senderName = ctx.update["message"]?.from.username;
     // const senderId = ctx.update["message"]?.from.id;
+    // NOTE - in reality would want to user sender's id to retrieve their purchases
     const result = await genResponse(inventory, purchases, text!);
     const respText = `${result}`;
     ctx.reply(respText);
